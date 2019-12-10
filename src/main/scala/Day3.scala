@@ -16,26 +16,42 @@ object Day3 {
 
     def main(args: Array[String]) = {
 
-        def splitLegs(s: String) = s.split(",").toList
+        def splitLegs(s: String) =
+            s.split(",").toList
 
-        println("Example from description: "
-            + findIntersections(parseWire(splitLegs(example1), (0, 0)), parseWire(splitLegs(example2), (0, 0))).min)
-        println("Test example 1: "
-            + findIntersections(parseWire(splitLegs(t1a), (0, 0)), parseWire(splitLegs(t1b), (0, 0))).min)
-        println("Test example 2: "
-            + findIntersections(parseWire(splitLegs(t2b), (0, 0)), parseWire(splitLegs(t2a), (0, 0))).min)
-        println("Live input: "
-            + findIntersections(parseWire(splitLegs(live1), (0, 0)), parseWire(splitLegs(live2), (0, 0))).min)
+        def mapToDistances(intersections: List[(Int, Int, Int)]) =
+            intersections.map(pos => pos._1.abs + pos._2.abs)
+
+        def calculateIntersections(wire1: String, wire2: String) = {
+            val parsedWire1 = parseWire(splitLegs(wire1))
+            println(parsedWire1)
+            findIntersections(parsedWire1, parseWire(splitLegs(wire2)))
+        }
+
+        val exampleIntersections = calculateIntersections(example1, example2)
+        val test1intersections = calculateIntersections(t1a, t1b)
+        val test2intersections = calculateIntersections(t2b, t2a)
+        val liveIntersections = calculateIntersections(live1, live2)
+
+        def printResult(descr: String, intersections: List[(Int, Int, Int)]) =
+            println(descr + mapToDistances(intersections).min + " -- " + intersections.map(_._3).min)
+
+        printResult("Example from description: ", exampleIntersections)
+        printResult("Test example 1: ", test1intersections)
+        printResult("Test example 2: ", test2intersections)
+        printResult("Live input: ", liveIntersections)
     }
 
-    def parseWire(wireString: List[String], position: (Int, Int)): List[Leg] = {
+    def parseWire(wireString: List[String], position: (Int, Int) = (0, 0), distance: Int = 0): List[Leg] = {
 
-        def calculateLeg(position: (Int, Int), legString: String): Leg =
+        def mkDist(distanceChars: List[Char]) = distanceChars.mkString.toInt
+
+        def calculateLeg(position: (Int, Int), legString: String): (Leg, Int) =
             legString.toCharArray.toList match {
-                case 'U' :: d => VerticalLeg(position._1, position._2, position._1, position._2 + d.mkString.toInt)
-                case 'D' :: d => VerticalLeg(position._1, position._2, position._1, position._2 - d.mkString.toInt)
-                case 'L' :: d => HorizontalLeg(position._1, position._2, position._1 - d.mkString.toInt, position._2)
-                case 'R' :: d => HorizontalLeg(position._1, position._2, position._1 + d.mkString.toInt, position._2)
+                case 'U' :: d => (VerticalLeg(position._1, position._2, position._1, position._2 + mkDist(d), distance), mkDist(d))
+                case 'D' :: d => (VerticalLeg(position._1, position._2, position._1, position._2 - mkDist(d), distance), mkDist(d))
+                case 'L' :: d => (HorizontalLeg(position._1, position._2, position._1 - mkDist(d), position._2, distance), mkDist(d))
+                case 'R' :: d => (HorizontalLeg(position._1, position._2, position._1 + mkDist(d), position._2, distance), mkDist(d))
                 case x => {
                     throw new IllegalArgumentException("Invalid input direction: " + x)
                 }
@@ -43,8 +59,8 @@ object Day3 {
 
         wireString match {
             case legString :: tail => {
-                val (leg) = calculateLeg(position, legString)
-                leg :: parseWire(tail, (leg.endX, leg.endY))
+                val (leg, d) = calculateLeg(position, legString)
+                leg :: parseWire(tail, (leg.endX, leg.endY), distance + d)
             }
             case _ => Nil
         }
@@ -57,9 +73,9 @@ object Day3 {
             def isBetween(a: Int, x: Int, b: Int) = (a to b contains x) || (b to a contains x)
 
             def crossPoint(v: VerticalLeg, h: HorizontalLeg) = (v, h) match {
-                case (VerticalLeg(vertStartX, vertStartY, _, vertEndY), HorizontalLeg(horStartX, horStartY, horEndX, _))
+                case (VerticalLeg(vertStartX, vertStartY, _, vertEndY, vertDist), HorizontalLeg(horStartX, horStartY, horEndX, _, horDist))
                     if isBetween(vertStartY, horStartY, vertEndY) && isBetween(horStartX, vertStartX, horEndX) =>
-                    Some(vertStartX, horStartY)
+                    Some(vertStartX, horStartY, vertDist + horDist + (vertStartX - horStartX).abs + (horStartY - vertStartY).abs)
                 case _ => None
             }
 
@@ -77,7 +93,7 @@ object Day3 {
             inter <- findIntersection(leg1, leg2)
         } yield {
             inter
-        }).filter(_ != (0, 0)).map(pos => pos._1.abs + pos._2.abs)
+        }).filter(i => i._1 != 0 && i._2 != 0)
     }
 }
 
@@ -89,8 +105,10 @@ trait Leg {
     def endX: Int
 
     def endY: Int
+
+    def distance: Int
 }
 
-case class HorizontalLeg(startX: Int, startY: Int, endX: Int, endY: Int) extends Leg
+case class HorizontalLeg(startX: Int, startY: Int, endX: Int, endY: Int, distance: Int) extends Leg
 
-case class VerticalLeg(startX: Int, startY: Int, endX: Int, endY: Int) extends Leg
+case class VerticalLeg(startX: Int, startY: Int, endX: Int, endY: Int, distance: Int) extends Leg
