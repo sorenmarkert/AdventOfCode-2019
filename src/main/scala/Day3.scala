@@ -29,7 +29,7 @@ object Day3 {
         def mkDist(distanceChars: List[Char]) = distanceChars.mkString.toInt
 
         def calculateLeg(position: (Int, Int), legString: String): (Leg, Int) =
-            legString.toCharArray.toList match {
+            legString.toList match {
                 case 'U' :: d => (VerticalLeg(position._1, position._2, position._1, position._2 + mkDist(d), distance), mkDist(d))
                 case 'D' :: d => (VerticalLeg(position._1, position._2, position._1, position._2 - mkDist(d), distance), mkDist(d))
                 case 'L' :: d => (HorizontalLeg(position._1, position._2, position._1 - mkDist(d), position._2, distance), mkDist(d))
