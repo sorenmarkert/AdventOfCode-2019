@@ -5,6 +5,7 @@ import Day1._
 class Day1Test extends AnyFlatSpec {
 
     "The fuel calculator" should "calculate the correct fuel" in {
+
         calculateFuel(12 :: Nil) mustEqual 2
         calculateFuel(14 :: Nil) mustEqual 2
         calculateFuel(1969 :: Nil) mustEqual 654
@@ -12,6 +13,7 @@ class Day1Test extends AnyFlatSpec {
     }
 
     "The total fuel calculator" should "calculate the correct fuel" in {
+
         calculateTotalFuel(12 :: Nil) mustEqual 2
         calculateTotalFuel(14 :: Nil) mustEqual 2
         calculateTotalFuel(1969 :: Nil) mustEqual 966
