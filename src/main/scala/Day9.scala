@@ -10,6 +10,9 @@ object Day9 {
         val boostCode = runWirableProgram(puzzleInput, MQueue(1))
         println(boostCode)
 
+        val coordinates = runWirableProgram(puzzleInput, MQueue(2))
+        println(coordinates)
+
     }
 
     def runWirableProgram(programInput: List[Long], inputs: MQueue[Long] = MQueue.empty[Long], pointer: Int = 0) = {
