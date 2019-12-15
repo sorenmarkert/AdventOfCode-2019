@@ -33,7 +33,7 @@ object Day6 {
         }
 
         val map = parseMap(mapStrings)
-        map.map{ case (k, _) => countOrbits(k, map) }.sum
+        map.map { case (k, _) => countOrbits(k, map) }.sum
     }
 
     private def parseMap(mapString: List[String]) =
