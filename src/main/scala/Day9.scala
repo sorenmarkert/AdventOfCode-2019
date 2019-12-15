@@ -18,7 +18,7 @@ object Day9 {
     def runWirableProgram(programInput: List[Long], inputs: MQueue[Long] = MQueue.empty[Long], pointer: Int = 0) = {
 
         var relativeBase = 0
-        val program: MMap[Int, Long] = MMap(programInput.zipWithIndex.map { case (a, b) => (b, a) }: _*)
+        val program: MMap[Int, Long] = MMap(programInput.zipWithIndex.map(_.swap): _*)
 
         val outputs = MQueue.empty[Long]
 
