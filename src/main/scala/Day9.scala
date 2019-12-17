@@ -15,10 +15,13 @@ object Day9 {
 
     }
 
-    def runWirableProgram(programInput: List[Long], inputs: MQueue[Long] = MQueue.empty[Long], pointer: Int = 0) = {
+    def runWirableProgram(programInput: List[Long], inputs: MQueue[Long] = MQueue.empty[Long], pointer: Int = 0): MQueue[Long] = {
+        runWirableProgram(MMap(programInput.zipWithIndex.map(_.swap): _*), inputs, pointer).outputs
+    }
+
+    def runWirableProgram(program: MMap[Int, Long], inputs: MQueue[Long], pointer: Int): PausedProgram = {
 
         var relativeBase = 0
-        val program: MMap[Int, Long] = MMap(programInput.zipWithIndex.map(_.swap): _*)
 
         val outputs = MQueue.empty[Long]
 
@@ -39,7 +42,7 @@ object Day9 {
             }
 
             val (opCode, modes) = {
-                val opCodeString = "000" + program(pointer).toString
+                val opCodeString = "0000" + program(pointer).toString
                 (opCodeString.takeRight(2).toInt, opCodeString.reverse.drop(2))
             }
 
@@ -95,7 +98,7 @@ object Day9 {
             }
         }
 
-        processOpCodes(pointer).outputs
+        processOpCodes(pointer)
     }
 
     case class PausedProgram(program: MMap[Int, Long], pointer: Int, inputs: MQueue[Long], outputs: MQueue[Long], isCompleted: Boolean)
